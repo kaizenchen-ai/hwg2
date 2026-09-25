@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌟 HWG2 英文單字練習網站 | 翰林三下 Family + Jobs</title>
+<style>
+  :root{
+    --primary:#FF6B6B;
+    --secondary:#4ECDC4;
+    --accent:#FFE66D;
+    --bg:#FFF8E7;
+    --card:#FFFFFF;
+    --text:#2D3436;
+    --shadow:0 4px 15px rgba(0,0,0,0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Comic Sans MS","微軟正黑體","PingFang TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+    min-height:100vh;
+  }
+  /* ─── 頂部導覽 ─── */
+  header{
+    background:linear-gradient(135deg,#FF6B6B 0%,#FFE66D 50%,#4ECDC4 100%);
+    color:white;
+    padding:20px;
+    text-align:center;
+    box-shadow:var(--shadow);
+    position:sticky;top:0;z-index:100;
+  }
+  header h1{font-size:2rem;text-shadow:2px 2px 4px rgba(0,0,0,0.2)}
+  header p{font-size:1rem;opacity:0.95;margin-top:5px}
+
+  nav{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
+    background:white;padding:10px;box-shadow:0 2px 5px rgba(0,0,0,0.05);
+    position:sticky;top:88px;z-index:99;
+  }
+  nav button{
+    border:none;background:var(--secondary);color:white;
+    padding:8px 16px;border-radius:20px;cursor:pointer;
+    font-size:0.95rem;font-weight:bold;transition:all 0.2s;
+  }
+  nav button:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  nav button.active{background:var(--primary);transform:scale(1.05)}
+
+  /* ─── Section ─── */
+  section{
+    max-width:1100px;margin:30px auto;padding:25px;
+    background:var(--card);border-radius:20px;box-shadow:var(--shadow);
+    display:none;
+  }
+  section.active{display:block;animation:fadeIn 0.4s}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  h2{color:var(--primary);font-size:1.8rem;margin-bottom:15px;border-bottom:4px dashed var(--accent);padding-bottom:8px}
+  h3{color:var(--secondary);margin:20px 0 10px;font-size:1.3rem}
+
+  /* ─── 單字卡（翻面） ─── */
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+    gap:15px;margin-top:20px;
+  }
+  .card{
+    perspective:1000px;height:200px;cursor:pointer;
+  }
+  .card-inner{
+    position:relative;width:100%;height:100%;
+    transition:transform 0.6s;transform-style:preserve-3d;
+  }
+  .card.flipped .card-inner{transform:rotateY(180deg)}
+  .card-front,.card-back{
+    position:absolute;width:100%;height:100%;
+    backface-visibility:hidden;border-radius:15px;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    padding:10px;text-align:center;
+  }
+  .card-front{
+    background:linear-gradient(135deg,#FFE66D,#FF6B6B);
+    color:white;font-size:1.5rem;font-weight:bold;
+  }
+  .card-front .emoji{font-size:3rem;margin-bottom:8px}
+  .card-back{
+    background:white;transform:rotateY(180deg);
+    border:3px solid var(--secondary);
+  }
+  .card-back .en{font-size:1.4rem;font-weight:bold;color:var(--primary);margin-bottom:5px}
+  .card-back .zh{font-size:1.2rem;color:var(--text)}
+  .card-back .ipa{font-size:0.9rem;color:#888;margin-top:5px;font-style:italic}
+  .card-back .speaker{margin-top:8px;font-size:1.8rem;cursor:pointer}
+  .card-back .speaker:hover{transform:scale(1.2);transition:transform 0.2s}
+  .card-back .hint{font-size:0.85rem;color:#666;margin-top:6px;font-style:italic}
+
+  /* ─── 例句框 ─── */
+  .example{
+    background:#F0F9FF;border-left:5px solid var(--secondary);
+    padding:12px 15px;margin:10px 0;border-radius:8px;
+    font-size:0.95rem;
+  }
+  .example b{color:var(--primary)}
+
+  /* ─── 遊戲通用 ─── */
+  .game-area{
+    background:#FFF8E7;padding:20px;border-radius:15px;margin-top:15px;
+  }
+  .score-board{
+    display:flex;justify-content:space-around;
+    background:white;padding:15px;border-radius:10px;margin-bottom:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  }
+  .score-board div{text-align:center}
+  .score-board .num{font-size:1.8rem;font-weight:bold;color:var(--primary)}
+  .score-board .label{font-size:0.9rem;color:#666}
+
+  /* 配對遊戲 */
+  .match-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  }
+  .match-card{
+    background:white;padding:15px;border-radius:10px;
+    text-align:center;cursor:pointer;
+    border:3px solid transparent;transition:all 0.2s;
+    font-size:1.1rem;font-weight:bold;
+  }
+  .match-card:hover{border-color:var(--secondary);transform:scale(1.05)}
+  .match-card.selected{border-color:var(--primary);background:#FFE66D}
+  .match-card.matched{background:#4ECDC4;color:white;cursor:default;opacity:0.7}
+
+  /* 聽寫 */
+  .dictation-box{
+    text-align:center;padding:30px;
+  }
+  .dictation-prompt{font-size:1.5rem;margin-bottom:20px}
+  .dictation-prompt .emoji{font-size:4rem;display:block;margin-bottom:10px}
+  .dictation-prompt .zh{color:#555}
+  .dictation-input{
+    font-size:1.3rem;padding:12px 20px;width:80%;max-width:300px;
+    border:3px solid var(--secondary);border-radius:10px;text-align:center;
+  }
+  .dictation-input:focus{outline:none;border-color:var(--primary)}
+  .dictation-feedback{margin-top:15px;font-size:1.2rem;min-height:30px}
+
+  /* 測驗 */
+  .quiz-question{font-size:1.2rem;margin-bottom:20px}
+  .quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+  .quiz-option{
+    background:white;padding:15px;border-radius:10px;cursor:pointer;
+    border:3px solid #DDD;transition:all 0.2s;font-size:1.1rem;
+  }
+  .quiz-option:hover{border-color:var(--secondary);background:#F0F9FF}
+  .quiz-option.correct{background:#4ECDC4;color:white;border-color:#4ECDC4}
+  .quiz-option.wrong{background:#FF6B6B;color:white;border-color:#FF6B6B}
+
+  /* 按鈕 */
+  .btn{
+    background:var(--primary);color:white;border:none;
+    padding:10px 25px;border-radius:25px;cursor:pointer;
+    font-size:1rem;font-weight:bold;margin:10px 5px;
+    box-shadow:var(--shadow);transition:all 0.2s;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn-secondary{background:var(--secondary)}
+  .btn-accent{background:var(--accent);color:var(--text)}
+
+  /* 結果彈窗 */
+  .modal{
+    display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;
+  }
+  .modal.show{display:flex}
+  .modal-content{
+    background:white;padding:40px;border-radius:20px;text-align:center;
+    max-width:400px;animation:bounce 0.5s;
+  }
+  @keyframes bounce{0%{transform:scale(0.5)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+  .modal h2{color:var(--primary);border:none;margin-bottom:15px}
+
+  /* 響應式 */
+  @media (max-width:600px){
+    header h1{font-size:1.4rem}
+    nav{top:78px}
+    .match-grid{grid-template-columns:repeat(3,1fr)}
+    .quiz-options{grid-template-columns:1fr}
+  }
+  footer{
+    text-align:center;padding:20px;color:#888;font-size:0.9rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌟 HWG2 英文單字練習網站 🌟</h1>
+  <p>翰林版三下 Here We Go 2 ｜ Family + Jobs 單字集</p>
+</header>
+
+<nav>
+  <button class="active" data-section="home">🏠 首頁</button>
+  <button data-section="family">👨‍👩‍👧‍👦 家人</button>
+  <button data-section="jobs">👨‍⚕️ 職業</button>
+  <button data-section="match">🎴 配對遊戲</button>
+  <button data-section="dictation">✏️ 聽寫</button>
+  <button data-section="quiz">🎯 終極測驗</button>
+</nav>
+
+<!-- ============== 首頁 ============== -->
+<section id="home" class="active">
+  <h2>👋 歡迎來到英文單字樂園！</h2>
+  <p>嗨，小朋友！這裡有 <b>25 個</b>超實用的英文單字，全部都來自翰林版三下 <b>Here We Go 2</b> 課本喔！</p>
+
+  <h3>📚 單字分類</h3>
+  <div class="cards">
+    <div class="card" onclick="showSection('family')">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="emoji">👨‍👩‍👧‍👦</div>
+          Family<br><small style="font-size:0.9rem">家人</small>
+        </div>
+        <div class="card-back">
+          <div class="en">Family</div>
+          <div class="zh">家人</div>
+          <div class="ipa">/ˈfæməli/</div>
+          <div class="hint">點擊開始 →</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" onclick="showSection('jobs')">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="emoji">👨‍⚕️</div>
+          Jobs<br><small style="font-size:0.9rem">職業</small>
+        </div>
+        <div class="card-back">
+          <div class="en">Jobs</div>
+          <div class="zh">職業</div>
+          <div class="ipa">/dʒɑbz/</div>
+          <div class="hint">點擊開始 →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>🎯 學習目標</h3>
+  <ul style="font-size:1.05rem;line-height:2;padding-left:30px">
+    <li>✅ 認識 <b>12 個家人稱謂</b>單字</li>
+    <li>✅ 認識 <b>10 個職業</b>單字</li>
+    <li>✅ 學會 <b>3 個身高形容</b> short / tall / me</li>
+    <li>✅ 玩 <b>3 種互動遊戲</b> 鞏固記憶</li>
+  </ul>
+
+  <h3>🗣️ 課本句型回顧</h3>
+  <div class="example">
+    <b>📌 家人句型：</b><br>
+    • A: <b>Who's he?</b> B: He's my father.<br>
+    • A: <b>Who's she?</b> B: She's my mother.<br>
+    • He's <b>tall</b>. / She's <b>short</b>.
+  </div>
+  <div class="example">
+    <b>📌 職業句型：</b><br>
+    • A: <b>Are you a teacher?</b> B: Yes, I am.<br>
+    • A: <b>Is he a doctor?</b> B: No, he's not. He's a nurse.<br>
+    • A: <b>Is she a driver?</b> B: No, she's not. She's a cook.
+  </div>
+</section>
+
+<!-- ============== 家人 ============== -->
+<section id="family">
+  <h2>👨‍👩‍👧‍👦 Family 家人單字</h2>
+  <p>點擊卡片可以翻面看中文解釋和聽發音喔！🔊</p>
+  <div class="cards" id="familyCards"></div>
+
+  <h3>📖 課本例句（Unit 1）</h3>
+  <div class="example">
+    📌 <b>Edison's grandma is calling.</b>（艾迪生的奶奶打電話來。）
+  </div>
+  <div class="example">
+    📌 <b>She's my mother.</b>（她是我媽媽。）<br>
+    📌 <b>He's my father.</b>（他是我爸爸。）
+  </div>
+  <div class="example">
+    📌 <b>She's my sister.</b>（她是我姊姊／妹妹。）<br>
+    📌 <b>She's my grandmother.</b>（她是我奶奶／外婆。）
+  </div>
+  <div class="example">
+    📌 <b>He's my brother. He's short.</b>（他是我弟弟／哥哥。他很矮。）<br>
+    📌 <b>He's my grandfather.</b>（他是我爺爺／外公。）
+  </div>
+</section>
+
+<!-- ============== 職業 ============== -->
+<section id="jobs">
+  <h2>👨‍⚕️ Jobs 職業單字</h2>
+  <p>點擊卡片可以翻面看中文解釋和聽發音喔！🔊</p>
+  <div class="cards" id="jobCards"></div>
+
+  <h3>📖 課本例句（Unit 3）</h3>
+  <div class="example">
+    📌 <b>Rocky is role-playing a doctor.</b>（Rocky 在扮演醫生。）<br>
+    📌 <b>Abu is role-playing a cook.</b>（Abu 在扮演廚師。）
+  </div>
+  <div class="example">
+    📌 <b>Are you a teacher?</b> — No, I'm not.<br>
+    📌 <b>Are you a cook?</b> — Yes, I am.
+  </div>
+  <div class="example">
+    📌 <b>Is he a doctor?</b> — Yes, he is.<br>
+    📌 <b>Is she a driver?</b> — No, she's not. She's a cook.
+  </div>
+</section>
+
+<!-- ============== 配對遊戲 ============== -->
+<section id="match">
+  <h2>🎴 配對遊戲</h2>
+  <p>把英文單字跟中文意思配對！選兩張一樣的就可以得分～</p>
+
+  <div class="game-area">
+    <div class="score-board">
+      <div><div class="num" id="matchScore">0</div><div class="label">✓ 配對成功</div></div>
+      <div><div class="num" id="matchTries">0</div><div class="label">🔄 嘗試次數</div></div>
+    </div>
+    <div class="match-grid" id="matchGrid"></div>
+    <div style="text-align:center;margin-top:15px">
+      <button class="btn btn-secondary" onclick="startMatchGame()">🔄 重新開始</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============== 聽寫 ============== -->
+<section id="dictation">
+  <h2>✏️ 聽寫練習</h2>
+  <p>看中文，輸入英文單字。忘記的話可以按 🔊 聽發音提示！</p>
+
+  <div class="game-area dictation-box">
+    <div class="score-board">
+      <div><div class="num" id="dictScore">0</div><div class="label">✓ 答對</div></div>
+      <div><div class="num" id="dictTotal">0</div><div class="label">📝 已寫</div></div>
+    </div>
+    <div class="dictation-prompt" id="dictPrompt">
+      <span class="emoji">🤔</span>
+      <span class="zh">準備好了嗎？</span>
+    </div>
+    <button class="btn btn-accent" onclick="speakCurrentDict()">🔊 聽發音</button>
+    <br>
+    <input type="text" class="dictation-input" id="dictInput" placeholder="輸入英文..." autocomplete="off">
+    <br>
+    <button class="btn" onclick="checkDictation()">送出答案</button>
+    <button class="btn btn-secondary" onclick="nextDictation()">跳過 →</button>
+    <div class="dictation-feedback" id="dictFeedback"></div>
+  </div>
+</section>
+
+<!-- ============== 終極測驗 ============== -->
+<section id="quiz">
+  <h2>🎯 終極小測驗</h2>
+  <p>看圖和中文，選出正確的英文單字！總共 10 題，加油！</p>
+
+  <div class="game-area">
+    <div class="score-board">
+      <div><div class="num" id="quizScore">0</div><div class="label">✓ 答對</div></div>
+      <div><div class="num" id="quizQ">1</div><div class="label">📝 第幾題</div></div>
+      <div><div class="num" id="quizTotal">10</div><div class="label">🎯 總題數</div></div>
+    </div>
+    <div id="quizBox" style="display:none">
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+    </div>
+    <div style="text-align:center;margin-top:15px">
+      <button class="btn" onclick="startQuiz()" id="quizStartBtn">🚀 開始測驗</button>
+    </div>
+  </div>
+</section>
+
+<!-- 結果彈窗 -->
+<div class="modal" id="resultModal">
+  <div class="modal-content">
+    <h2 id="resultTitle">🎉 太棒了！</h2>
+    <p id="resultText" style="font-size:1.2rem;margin:15px 0"></p>
+    <button class="btn" onclick="closeModal()">繼續練習 →</button>
+  </div>
+</div>
+
+<footer>
+  <p>📚 教材來源：翰林版 114 學年度 Here We Go 2（三下）備課用書</p>
+  <p>👨‍🏫 英文老師：陳楷仁 (0963193917)</p>
+  <p>🛠️ 由 Hermes Agent 為凱文老師自動生成</p>
+</footer>
+
+<script>
+/* ═══════════ 單字資料庫 ═══════════ */
+const familyWords = [
+  {emoji:"👵",en:"grandmother",zh:"奶奶／外婆",ipa:"/ˈɡrænmʌðɚ/",hint:"(grandma)"},
+  {emoji:"👴",en:"grandfather",zh:"爺爺／外公",ipa:"/ˈɡrænfɑðɚ/",hint:"(grandpa)"},
+  {emoji:"👩",en:"mother",zh:"媽媽",ipa:"/ˈmʌðɚ/",hint:"(mom)"},
+  {emoji:"👨",en:"father",zh:"爸爸",ipa:"/ˈfɑðɚ/",hint:"(dad)"},
+  {emoji:"👦",en:"brother",zh:"哥哥／弟弟",ipa:"/ˈbrʌðɚ/",hint:""},
+  {emoji:"👧",en:"sister",zh:"姊姊／妹妹",ipa:"/ˈsɪstɚ/",hint:""},
+  {emoji:"🙋",en:"me",zh:"我",ipa:"/mi/",hint:""},
+  // 延伸單字
+  {emoji:"👩‍🦰",en:"aunt",zh:"阿姨／姑姑",ipa:"/ænt/",hint:"延伸"},
+  {emoji:"👨‍🦰",en:"uncle",zh:"叔叔／舅舅",ipa:"/ˈʌŋkəl/",hint:"延伸"},
+  {emoji:"🧒",en:"cousin",zh:"堂(表)兄弟姊妹",ipa:"/ˈkʌzən/",hint:"延伸"},
+  {emoji:"👦",en:"son",zh:"兒子",ipa:"/sʌn/",hint:"延伸"},
+  {emoji:"👧",en:"daughter",zh:"女兒",ipa:"/ˈdɔtɚ/",hint:"延伸"},
+  // 身高
+  {emoji:"📏",en:"short",zh:"矮的",ipa:"/ʃɔrt/",hint:"身高"},
+  {emoji:"📏",en:"tall",zh:"高的",ipa:"/tɔl/",hint:"身高"},
+  {emoji:"👨‍👩‍👧‍👦",en:"family",zh:"家人",ipa:"/ˈfæməli/",hint:"主題字"},
+];
+
+const jobWords = [
+  {emoji:"🎒",en:"a student",zh:"學生",ipa:"/ə ˈstudənt/",hint:"核心"},
+  {emoji:"👨‍🏫",en:"a teacher",zh:"老師",ipa:"/ə ˈtitʃɚ/",hint:"核心"},
+  {emoji:"👨‍⚕️",en:"a doctor",zh:"醫生",ipa:"/ə ˈdɑktɚ/",hint:"核心"},
+  {emoji:"👩‍⚕️",en:"a nurse",zh:"護士",ipa:"/ə nɝs/",hint:"核心"},
+  {emoji:"🚗",en:"a driver",zh:"司機",ipa:"/ə ˈdraɪvɚ/",hint:"核心"},
+  {emoji:"👨‍🍳",en:"a cook",zh:"廚師",ipa:"/ə kʊk/",hint:"核心"},
+  // 延伸
+  {emoji:"📮",en:"mail carrier",zh:"郵差",ipa:"/mel ˈkæriɚ/",hint:"延伸"},
+  {emoji:"🚒",en:"firefighter",zh:"消防員",ipa:"/ˈfaɪrˌfaɪtɚ/",hint:"延伸"},
+  {emoji:"👮",en:"police officer",zh:"警察",ipa:"/pəˈlis ˈɔfɪsɚ/",hint:"延伸"},
+  {emoji:"💼",en:"office worker",zh:"上班族",ipa:"/ˈɔfɪs ˈwɝkɚ/",hint:"延伸"},
+];
+
+const allWords = [...familyWords, ...jobWords];
+
+/* ═══════════ 渲染單字卡 ═══════════ */
+function renderCards(containerId, words) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = words.map((w,i) => `
+    <div class="card" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="emoji">${w.emoji}</div>
+          ${w.en}
+          ${w.hint ? `<small style="font-size:0.7rem;display:block;margin-top:5px;opacity:0.9">[${w.hint}]</small>` : ''}
+        </div>
+        <div class="card-back">
+          <div class="en">${w.en}</div>
+          <div class="zh">${w.zh}</div>
+          <div class="ipa">${w.ipa}</div>
+          <span class="speaker" onclick="event.stopPropagation();speak('${w.en.replace(/'/g,"\\'")}')">🔊</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════ 語音合成 ═══════════ */
+function speak(text) {
+  if (!('speechSynthesis' in window)) {
+    alert('此瀏覽器不支援語音功能 😢');
+    return;
+  }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  u.pitch = 1.1;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* ═══════════ Section 切換 ═══════════ */
+function showSection(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const btn = document.querySelector(`nav button[data-section="${id}"]`);
+  if (btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.onclick = () => showSection(btn.dataset.section);
+});
+
+/* ═══════════ 配對遊戲 ═══════════ */
+let matchScore = 0, matchTries = 0, matchSelected = [];
+
+function startMatchGame() {
+  matchScore = 0; matchTries = 0; matchSelected = [];
+  updateMatchScore();
+  // 從 allWords 隨機抽 6 對
+  const pool = allWords.sort(() => Math.random() - 0.5).slice(0, 6);
+  const cards = [];
+  pool.forEach((w, i) => {
+    cards.push({id:i, type:'en', text:w.en, emoji:w.emoji});
+    cards.push({id:i, type:'zh', text:w.zh});
+  });
+  cards.sort(() => Math.random() - 0.5);
+  const grid = document.getElementById('matchGrid');
+  grid.innerHTML = cards.map((c, idx) => `
+    <div class="match-card" data-id="${c.id}" data-type="${c.type}" data-idx="${idx}">
+      ${c.emoji || ''} ${c.text}
+    </div>
+  `).join('');
+  grid.querySelectorAll('.match-card').forEach(el => {
+    el.onclick = () => selectMatchCard(el);
+  });
+}
+
+function selectMatchCard(el) {
+  if (el.classList.contains('matched') || el.classList.contains('selected')) return;
+  el.classList.add('selected');
+  matchSelected.push(el);
+  if (matchSelected.length === 2) {
+    matchTries++;
+    const [a, b] = matchSelected;
+    if (a.dataset.id === b.dataset.id && a.dataset.type !== b.dataset.type) {
+      // 配對成功
+      setTimeout(() => {
+        a.classList.add('matched'); b.classList.add('matched');
+        a.classList.remove('selected'); b.classList.remove('selected');
+        matchScore++;
+        matchSelected = [];
+        updateMatchScore();
+        speak(a.querySelector('.match-card') ? '' : a.textContent.trim().split(' ').pop());
+        if (matchScore === 6) {
+          setTimeout(() => showResult('🎉 全部配對成功！',
+            `你只用了 ${matchTries} 次就完成所有配對！太厲害了！`), 500);
+        }
+      }, 400);
+    } else {
+      setTimeout(() => {
+        a.classList.remove('selected'); b.classList.remove('selected');
+        matchSelected = [];
+      }, 800);
+    }
+    updateMatchScore();
+  }
+}
+
+function updateMatchScore() {
+  document.getElementById('matchScore').textContent = matchScore;
+  document.getElementById('matchTries').textContent = matchTries;
+}
+
+/* ═══════════ 聽寫練習 ═══════════ */
+let dictWords = [], dictIndex = 0, dictScore = 0, dictTotal = 0;
+
+function startDictation() {
+  dictWords = allWords.sort(() => Math.random() - 0.5).slice(0, 10);
+  dictIndex = 0; dictScore = 0; dictTotal = 0;
+  showNextDict();
+}
+
+function showNextDict() {
+  if (dictIndex >= dictWords.length) {
+    showResult('✏️ 聽寫完成！',
+      `你寫了 ${dictTotal} 題，答對 ${dictScore} 題！${dictScore === dictTotal ? '滿分！太神啦！🏆' : '繼續加油！'}`);
+    return;
+  }
+  const w = dictWords[dictIndex];
+  document.getElementById('dictPrompt').innerHTML = `
+    <span class="emoji">${w.emoji}</span>
+    <span class="zh">${w.zh}</span>
+  `;
+  document.getElementById('dictInput').value = '';
+  document.getElementById('dictInput').focus();
+  document.getElementById('dictFeedback').innerHTML = '';
+  document.getElementById('dictInput').onkeypress = (e) => {
+    if (e.key === 'Enter') checkDictation();
+  };
+}
+
+function speakCurrentDict() {
+  if (dictWords[dictIndex]) speak(dictWords[dictIndex].en);
+}
+
+function checkDictation() {
+  const w = dictWords[dictIndex];
+  const input = document.getElementById('dictInput').value.trim().toLowerCase();
+  const correct = w.en.toLowerCase().replace(/^a /, ''); // 容許不加 "a"
+  const fb = document.getElementById('dictFeedback');
+  dictTotal++;
+  if (input === w.en.toLowerCase() || input === correct) {
+    dictScore++;
+    fb.innerHTML = `✅ 答對了！ <b>${w.en}</b> = ${w.zh}`;
+    speak(w.en);
+  } else {
+    fb.innerHTML = `❌ 答案是 <b>${w.en}</b>（${w.zh}）`;
+  }
+  document.getElementById('dictScore').textContent = dictScore;
+  document.getElementById('dictTotal').textContent = dictTotal;
+  dictIndex++;
+  setTimeout(showNextDict, 1500);
+}
+
+function nextDictation() {
+  dictIndex++;
+  showNextDict();
+}
+
+/* ═══════════ 終極測驗 ═══════════ */
+let quizWords = [], quizIndex = 0, quizScore = 0;
+
+function startQuiz() {
+  quizWords = allWords.sort(() => Math.random() - 0.5).slice(0, 10);
+  quizIndex = 0; quizScore = 0;
+  document.getElementById('quizStartBtn').style.display = 'none';
+  document.getElementById('quizBox').style.display = 'block';
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  if (quizIndex >= 10) {
+    const msg = quizScore === 10 ? '🏆 滿分！你真的是英文小天才！'
+      : quizScore >= 7 ? '🎉 表現很棒！繼續努力！'
+      : quizScore >= 5 ? '💪 不錯喔！再多練習幾次會更好！'
+      : '📚 別灰心，多看幾次單字卡就會進步！';
+    showResult(`測驗結束！得分 ${quizScore}/10`, msg);
+    document.getElementById('quizStartBtn').style.display = 'inline-block';
+    document.getElementById('quizStartBtn').textContent = '🔄 再玩一次';
+    document.getElementById('quizBox').style.display = 'none';
+    return;
+  }
+  const correct = quizWords[quizIndex];
+  const distractors = allWords.filter(w => w.en !== correct.en)
+    .sort(() => Math.random() - 0.5).slice(0, 3);
+  const options = [correct, ...distractors].sort(() => Math.random() - 0.5);
+
+  document.getElementById('quizQ').textContent = quizIndex + 1;
+  document.getElementById('quizQuestion').innerHTML = `
+    ${correct.emoji}<br>
+    <span style="font-size:1.5rem;font-weight:bold">${correct.zh}</span>
+  `;
+  document.getElementById('quizOptions').innerHTML = options.map(o => `
+    <div class="quiz-option" data-en="${o.en}">${o.en}</div>
+  `).join('');
+
+  document.querySelectorAll('.quiz-option').forEach(el => {
+    el.onclick = () => answerQuiz(el, correct);
+  });
+}
+
+function answerQuiz(el, correct) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  if (el.dataset.en === correct.en) {
+    el.classList.add('correct');
+    quizScore++;
+    speak(correct.en);
+  } else {
+    el.classList.add('wrong');
+    document.querySelector(`.quiz-option[data-en="${correct.en}"]`).classList.add('correct');
+  }
+  document.getElementById('quizScore').textContent = quizScore;
+  setTimeout(() => {
+    quizIndex++;
+    showQuizQuestion();
+  }, 1200);
+}
+
+/* ═══════════ 結果彈窗 ═══════════ */
+function showResult(title, text) {
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultText').textContent = text;
+  document.getElementById('resultModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('resultModal').classList.remove('show');
+}
+
+/* ═══════════ 初始化 ═══════════ */
+renderCards('familyCards', familyWords);
+renderCards('jobCards', jobWords);
+startMatchGame();
+startDictation();
+</script>
+</body>
+</html>
