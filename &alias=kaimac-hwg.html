@@ -185,8 +185,112 @@
     .match-grid{grid-template-columns:repeat(3,1fr)}
     .quiz-options{grid-template-columns:1fr}
   }
-  footer{
-    text-align:center;padding:20px;color:#888;font-size:0.9rem;
+  /* ─── 4 大必備元素 Footer Credits Bar ─── */
+  .home-credits-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 2px solid var(--secondary);
+    border-radius: 20px;
+    padding: 24px 20px;
+    max-width: 900px;
+    margin: 30px auto 40px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    gap: 12px;
+  }
+  .credits-author {
+    font-size: 1.25rem;
+    color: var(--primary);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .credits-author strong {
+    color: #e84118;
+  }
+  .credits-date {
+    font-size: 0.95rem;
+    color: #576574;
+    font-family: Georgia, "Times New Roman", serif;
+    letter-spacing: 0.5px;
+  }
+  .credits-qrcodes-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    margin: 10px 0 5px;
+  }
+  .credits-qrcode-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .qrcode-card {
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--accent);
+    transition: transform 0.2s;
+  }
+  .qrcode-card:hover {
+    transform: scale(1.03);
+  }
+  .credits-qrcode-img {
+    width: 140px;
+    height: 140px;
+    display: block;
+  }
+  .qrcode-label {
+    font-size: 0.9rem;
+    color: var(--secondary);
+    font-weight: bold;
+    letter-spacing: 0.3px;
+  }
+  .qrcode-sublabel {
+    font-size: 0.9rem;
+    color: #8395a7;
+    font-weight: 600;
+  }
+  .credits-urls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.95rem;
+    color: #576574;
+    margin-top: 5px;
+  }
+  .credits-urls a {
+    color: #0984e3;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1.5px dashed rgba(9, 132, 227, 0.5);
+    transition: color 0.15s ease;
+  }
+  .credits-urls a:hover {
+    color: var(--primary);
+    border-bottom-style: solid;
+  }
+  .url-divider {
+    color: #c8d6e5;
+  }
+  .credits-footer-meta {
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px dashed #e0e0e0;
+    font-size: 0.85rem;
+    color: #888;
+    line-height: 1.6;
   }
 </style>
 </head>
@@ -383,10 +487,40 @@
   </div>
 </div>
 
-<footer>
-  <p>📚 教材來源：翰林版 114 學年度 Here We Go 2（三下）備課用書</p>
-  <p>👨‍🏫 英文老師：陳楷仁 (0963193917)</p>
-  <p>🛠️ 由 Hermes Agent 為凱文老師自動生成</p>
+<!-- 作者標註、西元正式日期、QR Code 與執行網址 (4 大必備元素) -->
+<footer class="home-credits-bar">
+  <div class="credits-author">👑 Created by <strong>Teacher Kevin</strong></div>
+  <div class="credits-date">📅 Saturday, September 26, 2026</div>
+
+  <div class="credits-qrcodes-container">
+    <div class="credits-qrcode-wrapper">
+      <div class="qrcode-card">
+        <img src="images/qrcode_github.svg" alt="GitHub Pages QR Code" class="credits-qrcode-img">
+      </div>
+      <div class="qrcode-label">🌐 GitHub 掃碼直達</div>
+    </div>
+    <div class="credits-qrcode-wrapper">
+      <div class="qrcode-card">
+        <img src="images/qrcode_firebase.svg" alt="Firebase Hosting QR Code" class="credits-qrcode-img">
+      </div>
+      <div class="qrcode-label">🔥 Firebase 掃碼直達</div>
+    </div>
+  </div>
+
+  <div class="qrcode-sublabel">📱 手機 / iPad 掃描 QR Code 立即開玩</div>
+
+  <div class="credits-urls">
+    <span>🌐 GitHub：<a href="https://tinyurl.com/kaimac-hwg-2" target="_blank" rel="noopener">tinyurl.com/kaimac-hwg-2</a></span>
+    <span class="url-divider">•</span>
+    <span>🔥 Firebase：<a href="https://tinyurl.com/kaimac-hwg2-firebase" target="_blank" rel="noopener">tinyurl.com/kaimac-hwg2-firebase</a></span>
+    <span class="url-divider">•</span>
+    <span>💻 開源：<a href="https://github.com/kaizenchen-ai/hwg2" target="_blank" rel="noopener">github.com/kaizenchen-ai/hwg2</a></span>
+  </div>
+
+  <div class="credits-footer-meta">
+    <p>📚 教材來源：翰林版 114 學年度 Here We Go 2（三下）備課用書</p>
+    <p>👨‍🏫 英文老師：陳楷仁 (0963193917)</p>
+  </div>
 </footer>
 
 <script>
